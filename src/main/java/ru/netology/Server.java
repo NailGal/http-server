@@ -41,7 +41,7 @@ public class Server {
                     return;
                 }
                 Handler handler = findHandler(request);
-                if (handler == null) {
+                if (handler != null) {
                     handler.handle(request, out);
                 } else {
                     sendNotFound(out);
@@ -73,7 +73,10 @@ public class Server {
         String[] requestLine = headers[0].split(" ");
         if (requestLine.length < 3) return null;
         String method = requestLine[0];
-        String path = requestLine[1].split("\\?")[0];
+        String pathAndQuery = requestLine[1];
+        String[] pathParts = pathAndQuery.split("\\?", 2);
+        String path = pathParts[0];
+        String query = pathParts.length > 1 ? pathParts[1] : "";
         Map<String, String> headersMap = new ConcurrentHashMap<>();
 
         for (int i = 1; i < headers.length; i++) {
@@ -85,7 +88,7 @@ public class Server {
         }
 
         InputStream body = new ByteArrayInputStream(Arrays.copyOfRange(buffer.toByteArray(), headerEnd + 4, buffer.size()));
-        return new Request(method, path, headersMap, body);
+        return new Request(method, path, headersMap, body, query);
     }
 
     private Handler findHandler(Request request) {
