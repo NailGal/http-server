@@ -87,8 +87,11 @@ public class Server {
             }
         }
 
-        InputStream body = new ByteArrayInputStream(Arrays.copyOfRange(buffer.toByteArray(), headerEnd + 4, buffer.size()));
-        return new Request(method, path, headersMap, body, query);
+        InputStream bodyStream = new ByteArrayInputStream(Arrays.copyOfRange(
+                buffer.toByteArray(),
+                headerEnd + 4,
+                buffer.size()));
+        return new Request(method, path, headersMap, bodyStream, query);
     }
 
     private Handler findHandler(Request request) {
